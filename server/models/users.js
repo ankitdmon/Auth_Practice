@@ -49,17 +49,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    timestamp: {
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-      deletedAt: {
-        type: Date,
-      },
-      updatedAt: {
-        type: Date,
-      },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    updatedAt: {
+      type: Date,
     },
   },
   {

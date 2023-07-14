@@ -32,13 +32,13 @@ exports.register = async (req, res) => {
     }
 
     const mobileAvail = await publicFunc.checkIfMobileExists(mobile);
-    if(!mobileAvail){
+    if (!mobileAvail) {
       return failResponse(req, res, "Mobile no already taken!!");
     }
 
     const emailAvail = await publicFunc.checkIfEmailExists(email);
-    if(!emailAvail){
-      return failResponse(req, res, "Email already taken!!")
+    if (!emailAvail) {
+      return failResponse(req, res, "Email already taken!!");
     }
 
     const passwordValidate = password.search(
@@ -52,7 +52,7 @@ exports.register = async (req, res) => {
       );
     }
 
-    const result = await usersFunc.register(
+    const userResult = await usersFunc.register(
       userName,
       fullName,
       email,
@@ -62,7 +62,11 @@ exports.register = async (req, res) => {
       role,
       password
     );
-    return successResponse(req, res, result);
+    const token = usersFunc.getAuthToken(userResult);
+    delete userResult.password;
+    userResult.token = token;
+    console.log(token);
+    return successResponse(req, res, userResult);
   } catch (error) {
     return errorResponse(req, res, error);
   }
