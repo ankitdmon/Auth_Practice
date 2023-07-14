@@ -31,6 +31,16 @@ exports.register = async (req, res) => {
       });
     }
 
+    const mobileAvail = await publicFunc.checkIfMobileExists(mobile);
+    if(!mobileAvail){
+      return failResponse(req, res, "Mobile no already taken!!");
+    }
+
+    const emailAvail = await publicFunc.checkIfEmailExists(email);
+    if(!emailAvail){
+      return failResponse(req, res, "Email already taken!!")
+    }
+
     const passwordValidate = password.search(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s]).+$/
     );
