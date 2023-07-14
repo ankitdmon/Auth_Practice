@@ -5,7 +5,7 @@ const app = express();
 const users = require("./users");
 // const questions = require("./questions");
 
-app.use(users);
+app.use("/users",users);
 // app.use(questions);
 
 module.exports = app;
