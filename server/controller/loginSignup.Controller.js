@@ -3,8 +3,8 @@ const {
   failResponse,
   errorResponse,
 } = require("../helper/responses");
-const usersFunc = require("../func/usersFunc");
-const publicFunc = require("../func/publicFunc");
+const usersFunc = require("../func/user.func");
+const loginSignup = require("../func/loginSignup.func");
 
 exports.register = async (req, res) => {
   try {
@@ -22,21 +22,21 @@ exports.register = async (req, res) => {
       );
     }
 
-    const userNameAvail = await publicFunc.checkIfUsernameExists(userName);
+    const userNameAvail = await loginSignup.checkIfUsernameExists(userName);
     if (!userNameAvail) {
-      const suggestedList = await publicFunc.userNameSuggestion(userName);
+      const suggestedList = await loginSignup.userNameSuggestion(userName);
       return failResponse(req, res, {
         message: "UserName already taken!!",
         userNameList: suggestedList,
       });
     }
 
-    const mobileAvail = await publicFunc.checkIfMobileExists(mobile);
+    const mobileAvail = await loginSignup.checkIfMobileExists(mobile);
     if (!mobileAvail) {
       return failResponse(req, res, "Mobile no already taken!!");
     }
 
-    const emailAvail = await publicFunc.checkIfEmailExists(email);
+    const emailAvail = await loginSignup.checkIfEmailExists(email);
     if (!emailAvail) {
       return failResponse(req, res, "Email already taken!!");
     }
@@ -67,7 +67,7 @@ exports.register = async (req, res) => {
 
     user.token = token;
 
-    console.log(user);
+    // console.log(user);
     return successResponse(req, res, user);
   } catch (error) {
     return errorResponse(req, res, error);
@@ -94,7 +94,7 @@ exports.login = async (req, res) => {
       if (!password) {
         return failResponse(req, res, "Please enter password!!");
       }
-      const mobileAvail = await publicFunc.checkIfMobileExists(mobile);
+      const mobileAvail = await loginSignup.checkIfMobileExists(mobile);
       if (mobileAvail) {
         return failResponse(req, res, "Mobile no is not registered!!");
       }
@@ -115,7 +115,7 @@ exports.login = async (req, res) => {
       if (!password) {
         return failResponse(req, res, "Please enter pasword!!");
       }
-      const emailAvail = await publicFunc.checkIfEmailExists(email);
+      const emailAvail = await loginSignup.checkIfEmailExists(email);
       if (emailAvail) {
         return failResponse(req, res, "Email is not resgistered!!");
       }
@@ -136,7 +136,7 @@ exports.login = async (req, res) => {
       if (!password) {
         return failResponse(req, res, "Please enter password!!");
       }
-      const userNameAvail = await publicFunc.checkIfUsernameExists(userName);
+      const userNameAvail = await loginSignup.checkIfUsernameExists(userName);
       if (userNameAvail) {
         return failResponse(req, res, "Username is not registered!!");
       }
@@ -154,53 +154,63 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getUserById = async (req, res) => {
+exports.isUserNameAvailable = async (req, res) => {
   try {
-    const userId = req.body.userId;
-    if (!userId) {
-      return failResponse(req, res, "Enter userId!!");
+    let userName = req.body.userName;
+    if (!userName) {
+      return failResponse(req, res, "Please enter a username!");
     }
-    const result = await usersFunc.getUserById(userId);
-    return successResponse(req, res, result);
+    if (userName.trim().includes(" ")) {
+      return failResponse(req, res, "Username will not contain space!!");
+    }
+
+    // Check if the username already exists in the database
+    const userExists = await loginSignup.checkIfUsernameExists(userName);
+    if (!userExists) {
+      // Generate a list of suggested usernames
+      let list = await loginSignup.userNameSuggestion(userName);
+      let suggestedList = list.filter((name) => name !== userName);
+      return failResponse(req, res, {
+        message: "Username is already taken!",
+        userNameList: suggestedList,
+      });
+    } else {
+      return successResponse(req, res, "Avalible!!");
+    }
   } catch (error) {
     return errorResponse(req, res, error);
   }
 };
 
-exports.getUserByMobile = async (req, res) => {
+exports.isMobileAvaliable = async (req, res) => {
   try {
-    const mobile = req.body.mobile;
+    let mobile = req.body.mobile;
     if (!mobile) {
-      return failResponse(req, res, "Enter mobile no!!");
+      return failResponse(req, res, "Enter mobile no!");
     }
-    const result = await usersFunc.getUserByMobile(mobile);
-    return successResponse(req, res, result);
+    const mobileExist = await loginSignup.checkIfMobileExists(mobile);
+    if (!mobileExist) {
+      return failResponse(req, res, "Mobile no already taken!!");
+    } else {
+      return successResponse(req, res, "Avaliable!!");
+    }
   } catch (error) {
     return errorResponse(req, res, error);
   }
 };
 
-exports.getUserByEmail = async (req, res) => {
+exports.isEmailAvaliable = async (req, res) => {
   try {
     const email = req.body.email;
     if (!email) {
-      return failResponse(req, res, "Enter email!!");
+      return errorResponse(req, res, "Enter email!");
     }
-    const result = await usersFunc.getUserByEmail(email);
-    return successResponse(req, res, result);
-  } catch (error) {
-    return errorResponse(req, res, error);
-  }
-};
-
-exports.getUserByUsername = async (req, res) => {
-  try {
-    const userName = req.body.userName;
-    if (!userName) {
-      return failResponse(req, res, "Enter userName!!");
+    const emailExist = await loginSignup.checkIfEmailExists(email);
+    if (!emailExist) {
+      return failResponse(req, res, "Email already taken!!");
+    } else {
+      return successResponse(req, res, "Avaliable!!");
     }
-    const result = await usersFunc.getUserByUsername(userName);
-    return successResponse(req, res, result);
   } catch (error) {
     return errorResponse(req, res, error);
   }
