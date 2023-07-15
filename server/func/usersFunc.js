@@ -37,6 +37,28 @@ exports.getUserByMobile= async(mobile)=>{
     return users;
 }
 
+exports.getUserByEmail= async(email)=>{
+  const userResults = await User.find({ email });
+    const users = userResults.map((user) => {
+      const userObject = user.toObject(); // Convert Mongoose Document to plain JavaScript object
+      delete userObject.password;
+      return userObject;
+    });
+    // console.log(users);
+    return users;
+}
+
+exports.getUserByUsername= async(userName)=>{
+  const userResults = await User.find({ userName });
+    const users = userResults.map((user) => {
+      const userObject = user.toObject(); // Convert Mongoose Document to plain JavaScript object
+      delete userObject.password;
+      return userObject;
+    });
+    // console.log(users);
+    return users;
+}
+
 exports.register = async (
   userName,
   fullName,
