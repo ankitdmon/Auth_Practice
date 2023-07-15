@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
     let { userName, fullName, email, mobile, dob, gender, role, password } =
       req.body;
     if (!userName && !fullName && !mobile && role && password && !gender) {
-      return failResponse(req, res, "Please enter the reqiored fileds!!");
+      return failResponse(req, res, "Please enter the required fields!!");
     }
     const userNameValidate = userName.search(/^[a-zA-Z0-9\-\@\#\_]*$/);
     if (userNameValidate === -1) {
@@ -48,11 +48,11 @@ exports.register = async (req, res) => {
       return failResponse(
         req,
         res,
-        "Enter password with atleast one lowercase character , uppercase character , number and special character"
+        "Enter password with at least one lowercase character, uppercase character, number, and special character"
       );
     }
 
-    const userResult = await usersFunc.register(
+    let userResult = await usersFunc.register(
       userName,
       fullName,
       email,
@@ -62,11 +62,26 @@ exports.register = async (req, res) => {
       role,
       password
     );
-    const token = usersFunc.getAuthToken(userResult);
-    delete userResult.password;
-    userResult.token = token;
-    console.log(token);
-    return successResponse(req, res, userResult);
+    const user = await usersFunc.getUserById(userResult._id);
+    const token = await usersFunc.getAuthToken(userResult);
+
+    user.token = token;
+
+    console.log(user);
+    return successResponse(req, res, user);
+  } catch (error) {
+    return errorResponse(req, res, error);
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    if (!userId) {
+      return failResponse(req, res, "Enter userId!!");
+    }
+    const result = await usersFunc.getUserById(userId);
+    return successResponse(req, res, result);
   } catch (error) {
     return errorResponse(req, res, error);
   }

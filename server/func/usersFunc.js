@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const hashPassword = require("../utills/authUtills");
 const User = require("../models/users");
 
-exports.getAuthToken = (user) => {
+exports.getAuthToken = async (user) => {
+  delete user.password;
   const { id, email, userName, mobile, role } = user;
   // const { id: sessionId, deviceId } = session;
 
@@ -17,8 +18,15 @@ exports.getAuthToken = (user) => {
   return token;
 };
 
+exports.getUserById = async (userId) => {
+  const userResult = await User.findOne({ _id: userId });
+  const user = userResult.toObject(); // Convert Mongoose Document to JavaScript object
+  delete user.password;
+  console.log(user);
+  return user;
+};
 
-exports.register = async function register(
+exports.register = async (
   userName,
   fullName,
   email,
@@ -27,9 +35,8 @@ exports.register = async function register(
   gender,
   role,
   password
-) {
+) => {
   const hashedPassword = await hashPassword(password);
-
 
   const newUser = await User.create({
     userName,
@@ -41,6 +48,5 @@ exports.register = async function register(
     role,
     password: hashedPassword,
   });
-
   return newUser;
 };
