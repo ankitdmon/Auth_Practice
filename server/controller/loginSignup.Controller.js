@@ -189,10 +189,10 @@ exports.isMobileAvaliable = async (req, res) => {
       return failResponse(req, res, "Enter mobile no!");
     }
     const mobileExist = await loginSignup.checkIfMobileExists(mobile);
-    if (!mobileExist) {
-      return failResponse(req, res, "Mobile no already taken!!");
+    if (mobileExist) {
+      return successResponse(req, res, "available");
     } else {
-      return successResponse(req, res, "Avaliable!!");
+      return failResponse(req, res, "notAvailable");
     }
   } catch (error) {
     return errorResponse(req, res, error);
@@ -206,10 +206,10 @@ exports.isEmailAvaliable = async (req, res) => {
       return errorResponse(req, res, "Enter email!");
     }
     const emailExist = await loginSignup.checkIfEmailExists(email);
-    if (!emailExist) {
-      return failResponse(req, res, "Email already taken!!");
+    if (emailExist) {
+      return successResponse(req, res, "available");
     } else {
-      return successResponse(req, res, "Avaliable!!");
+      return failResponse(req, res, "notAvailable");
     }
   } catch (error) {
     return errorResponse(req, res, error);

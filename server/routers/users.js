@@ -2,8 +2,6 @@ const express = require("express");
 const router = express();
 const usersController = require("../controller/users.Controller");
 
-
-
 router.post("/getUserById", usersController.getUserById);
 
 router.post("/getUserByMobile", usersController.getUserByMobile);
