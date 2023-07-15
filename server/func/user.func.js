@@ -3,7 +3,7 @@ const hashPassword = require("../utills/authUtills");
 const User = require("../models/users");
 
 exports.getAuthToken = async (user) => {
-  delete user.password;
+  // delete user.password;
   const { id, email, userName, mobile, role } = user;
   // const { id: sessionId, deviceId } = session;
 

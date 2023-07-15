@@ -8,7 +8,7 @@ const usersFunc = require("../func/user.func");
 
 exports.getUserById = async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.body.userId || req.user._id;
     if (!userId) {
       return failResponse(req, res, "Enter userId!!");
     }
