@@ -74,6 +74,33 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.login = async (req, res) => {
+  try {
+    const { mobile, password } = req.body;
+    if (!mobile) {
+      return failResponse(req, res, "Enter mobile no!!");
+    }
+    if (!password) {
+      return failResponse(req, res, "Please enter password!!");
+    }
+    const mobileAvail = await publicFunc.checkIfMobileExists(mobile);
+    if (mobileAvail) {
+      return failResponse(req, res, "Mobile no is not registered!!");
+    }
+    userResult = await usersFunc.getUserByMobile(mobile);
+    userResult = userResult[0];
+    if (!userResult) {
+      return failResponse(req, res, "User not exists");
+    }
+    const token = await usersFunc.getAuthToken(userResult);
+    userResult.token = token;
+    return successResponse(req, res, userResult);
+
+  } catch (error) {
+    return errorResponse(req, res, error, "Login Failed!!");
+  }
+};
+
 exports.getUserById = async (req, res) => {
   try {
     const userId = req.body.userId;
@@ -86,3 +113,17 @@ exports.getUserById = async (req, res) => {
     return errorResponse(req, res, error);
   }
 };
+
+exports.getUserByMobile = async(req, res)=>{
+  try{
+    const mobile = req.body.mobile;
+    if(!mobile){
+      return failResponse(req, res, "Enter mobile no!!");
+    }
+    const result = await usersFunc.getUserByMobile(mobile);
+    return successResponse(req, res, result)
+  }
+  catch(error){
+    return errorResponse(req, res, error);
+  }
+}

@@ -22,9 +22,20 @@ exports.getUserById = async (userId) => {
   const userResult = await User.findOne({ _id: userId });
   const user = userResult.toObject(); // Convert Mongoose Document to JavaScript object
   delete user.password;
-  console.log(user);
+  // console.log(user);
   return user;
 };
+
+exports.getUserByMobile= async(mobile)=>{
+  const userResults = await User.find({ mobile });
+    const users = userResults.map((user) => {
+      const userObject = user.toObject(); // Convert Mongoose Document to plain JavaScript object
+      delete userObject.password;
+      return userObject;
+    });
+    // console.log(users);
+    return users;
+}
 
 exports.register = async (
   userName,
